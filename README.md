@@ -1,12 +1,6 @@
 # xmip-core-identify-transport
 
-Identify by transport: reads one named transport property the carrier promoted; a transport-layer identifier whose claim is passed. A technology of
-[xmip-core-identify](https://github.com/IlleNilsson/xmip-core-identify).
-
-Declared and not yet written; `architecture.toml` carries the maturity. When
-it is written it implements `TransportIdentifier`, one mechanism at one gate (ADR-0050).
-What it may depend on is `repository-model.md` section 4 and ADR-0044: its
-capability, and no sibling.
+Identify by transport: one named property the carrier promoted, an MQTT client id or an AMQP container id; a transport-layer claim, passed. A technology of [xmip-core-identify](https://github.com/IlleNilsson/xmip-core-identify).
 
 ## Toolchain
 
