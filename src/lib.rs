@@ -110,12 +110,8 @@ impl TransportIdentifier for TransportProperty {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use stream::Stream;
-    use xcore::{Established, Layer, StreamId};
 
-    fn stream() -> Stream {
-        Stream::new(StreamId::new(1), b"<order/>".to_vec(), None)
-    }
+    use xcore::{Established, Layer};
 
     fn facts(pairs: &[(&str, &str)]) -> Vec<(String, String)> {
         pairs
@@ -126,12 +122,11 @@ mod tests {
 
     #[test]
     fn a_promoted_client_id_is_the_claim_and_the_property_is_on_the_record() {
-        let stream = stream();
         let facts = facts(&[
             ("mqtt.client-id", "press-line-4"),
             ("peer.address", "10.0.0.7:51022"),
         ]);
-        let arrival = StreamArrival::new(&stream, Arriving::Pushed, "mqtt://xmip/press", &facts);
+        let arrival = StreamArrival::new(Arriving::Pushed, "mqtt://xmip/press", &facts);
 
         let claim = TransportProperty::named("mqtt.client-id")
             .expect("a name")
@@ -151,9 +146,8 @@ mod tests {
 
     #[test]
     fn the_default_reads_the_shared_name_for_a_peer() {
-        let stream = stream();
         let facts = facts(&[(PEER, "container-7")]);
-        let arrival = StreamArrival::new(&stream, Arriving::Pushed, "amqp://xmip/in", &facts);
+        let arrival = StreamArrival::new(Arriving::Pushed, "amqp://xmip/in", &facts);
 
         let claim = TransportProperty::default()
             .identify(&arrival)
@@ -165,9 +159,8 @@ mod tests {
 
     #[test]
     fn an_arrival_the_carrier_promoted_nothing_onto_presents_nothing() {
-        let stream = stream();
         let facts = facts(&[("kafka.client-id", "billing")]);
-        let arrival = StreamArrival::new(&stream, Arriving::Pushed, "kafka://xmip/in", &facts);
+        let arrival = StreamArrival::new(Arriving::Pushed, "kafka://xmip/in", &facts);
 
         assert!(
             TransportProperty::default()
@@ -179,9 +172,8 @@ mod tests {
 
     #[test]
     fn a_property_promoted_and_left_empty_is_an_error_and_not_an_absence() {
-        let stream = stream();
         let facts = facts(&[(PEER, "  ")]);
-        let arrival = StreamArrival::new(&stream, Arriving::Pushed, "amqp://xmip/in", &facts);
+        let arrival = StreamArrival::new(Arriving::Pushed, "amqp://xmip/in", &facts);
 
         let failure = TransportProperty::default()
             .identify(&arrival)
@@ -205,11 +197,10 @@ mod tests {
 
     #[test]
     fn a_detected_or_scheduled_arrival_has_no_peer_that_named_itself() {
-        let stream = stream();
         let facts = facts(&[(PEER, "xmip-node-1")]);
 
         for arriving in [Arriving::Detected, Arriving::Scheduled] {
-            let arrival = StreamArrival::new(&stream, arriving, "kafka://broker/topic", &facts);
+            let arrival = StreamArrival::new(arriving, "kafka://broker/topic", &facts);
 
             assert!(
                 TransportProperty::default()
